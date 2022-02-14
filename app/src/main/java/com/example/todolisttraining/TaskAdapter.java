@@ -10,10 +10,24 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class TaskCustomAdapter  extends RecyclerView.Adapter<TaskCustomAdapter.ViewHolder>{
-    private static final String TAG = "TaskCustomAdapter";
+import java.util.ArrayList;
+import java.util.List;
 
-    private TaskModel mModel;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
+
+/**
+ * リストの表示データとリストUIをひもつける
+ */
+public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder>{
+    private static final String TAG = "TaskAdapter";
+
+    private DeleteTaskListener mListener;
+    private List<String> mData;
+
+    public TaskAdapter() {
+        mData = new ArrayList<String>();
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -35,10 +49,6 @@ public class TaskCustomAdapter  extends RecyclerView.Adapter<TaskCustomAdapter.V
         }
     }
 
-    public TaskCustomAdapter(TaskModel model) {
-        mModel = model;
-    }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -53,22 +63,29 @@ public class TaskCustomAdapter  extends RecyclerView.Adapter<TaskCustomAdapter.V
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Log.d(TAG, "Element " + position + " set.");
 
-        // Get element from your dataset at this position and replace the contents of the view
-        // with that element
-        holder.getTextView().setText(mModel.getAll().get(position).getText());
-
-        holder.getDeleteTaskButton().setTag(mModel.getAll().get(position).getId());
+        holder.getTextView().setText(mData.get(position));
+        holder.getDeleteTaskButton().setTag(position);
         holder.getDeleteTaskButton().setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.d(TAG, "Element " + v.getTag() + " deleted.");
-                mModel.delete((int)v.getTag());
-                notifyDataSetChanged();
+                if(mListener != null) {
+                    mListener.onClickDeleteTask((int)v.getTag());
+                }
+
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return mModel.getAll().size();
+        return mData.size();
+    }
+
+    public void setData(List<String> data) {
+        mData = data;
+    }
+
+    public void setDeleteTaskListener(DeleteTaskListener listener) {
+        mListener = listener;
     }
 }
