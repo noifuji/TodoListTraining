@@ -2,20 +2,22 @@ package com.example.todolisttraining;
 
 import android.content.Context;
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
-import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import com.example.todolisttraining.db.AppDatabase;
+import com.example.todolisttraining.db.TaskDAO;
+import com.example.todolisttraining.db.TaskEntity;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -26,6 +28,10 @@ import static org.junit.Assert.*;
 public class SimpleEntityReadWriteTest {
     private TaskDAO taskDao;
     private AppDatabase db;
+
+    @Rule
+    public InstantTaskExecutorRule instantTaskExecutorRule =
+            new InstantTaskExecutorRule();
 
     @Before
     public void createDb() {
@@ -39,31 +45,31 @@ public class SimpleEntityReadWriteTest {
         db.close();
     }
 
-/*    @Test
+    @Test
     public void writeTaskAndReadInList() throws Exception {
         TaskEntity task = new TaskEntity();
+        task.setId(0);
+        task.setText("aaa");
+        taskDao.insert(task).blockingAwait();
 
-
-        taskDao.insert(task);
-        List<TaskEntity> all = taskDao.getAll();
-        assertEquals(1, all.size());
+        taskDao.getAll()
+                .test()
+                .assertValue(tasks -> tasks.size() == 1);
     }
 
     @Test
     public void deleteTask() throws Exception {
         TaskEntity task = new TaskEntity();
-        task.id = 1;
-        task.text = "Hello";
+        task.setId(1);
+        task.setText("aaa");
 
-        taskDao.insert(task);
+        taskDao.insert(task).blockingAwait();
 
-        task = new TaskEntity();
-        task.id = 1;
+        taskDao.delete(task).blockingAwait();
 
-        taskDao.delete(task);
+        taskDao.getAll()
+                .test()
+                .assertValue(tasks -> tasks.size() == 0);
 
-        List<TaskEntity> all = taskDao.getAll();
-        assertEquals(0, all.size());
-
-    }*/
+    }
 }

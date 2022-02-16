@@ -1,19 +1,21 @@
-package com.example.todolisttraining;
+package com.example.todolisttraining.viewmodel;
 
-import android.app.Activity;
+import android.app.Application;
 import android.os.Build;
-import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.lifecycle.AndroidViewModel;
+
+import com.example.todolisttraining.AppComponent;
+import com.example.todolisttraining.db.TaskDAO;
+import com.example.todolisttraining.db.TaskEntity;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
-import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 
 /**
@@ -28,17 +30,18 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
  * 個別のビューをもたないようにする
  */
 
-public class TaskViewModel {
+public class TaskListViewModel extends AndroidViewModel {
     private final String TAG = "TaskViewModel";
     private TaskDAO mTaskDAO;
     private List<TaskEntity> mTasks;
 
-    public TaskViewModel(TaskDAO taskDAO) {
-        mTaskDAO = taskDAO;
+    public TaskListViewModel(@NonNull Application application){
+        super(application);
+        mTaskDAO = ((AppComponent)application).getDatabase().taskDAO();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public Flowable<List<String>> getTaskText() {
+    public Flowable<List<String>> getTaskTextList() {
         return mTaskDAO.getAll()
                 // for every emission of the user, get the user name
                 .map(tasks -> {
@@ -53,11 +56,28 @@ public class TaskViewModel {
     public Completable insertTask(final String text) {
         TaskEntity task = new TaskEntity();
         task.setText(text);
-        mTasks.add(task);
         return mTaskDAO.insert(task);
     }
 
     public Completable deleteTask(int position) {
         return mTaskDAO.delete(mTasks.get(position));
     }
+
+
+/*    public static class TaskListViewModelFactory extends ViewModelProvider.NewInstanceFactory {
+
+        @NonNull
+        private final Application mApplication;
+
+        public TaskListViewModelFactory(@NonNull Application application) {
+            mApplication = application;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        @NonNull
+        public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+            return (T) new TaskListViewModel(mApplication);
+        }
+    }*/
 }

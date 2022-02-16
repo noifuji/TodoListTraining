@@ -1,4 +1,4 @@
-package com.example.todolisttraining;
+package com.example.todolisttraining.db;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;

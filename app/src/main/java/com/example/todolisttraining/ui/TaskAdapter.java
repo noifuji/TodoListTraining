@@ -1,4 +1,4 @@
-package com.example.todolisttraining;
+package com.example.todolisttraining.ui;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,11 +10,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.todolisttraining.R;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * リストの表示データとリストUIをひもつける
@@ -83,6 +82,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder>{
 
     public void setData(List<String> data) {
         mData = data;
+        notifyDataSetChanged();
     }
 
     public void setDeleteTaskListener(DeleteTaskListener listener) {

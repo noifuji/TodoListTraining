@@ -29,6 +29,7 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     def room_version = "2.4.1"
 
     implementation 'androidx.appcompat:appcompat:1.4.1'
@@ -44,6 +45,15 @@ dependencies {
 
     // optional - RxJava3 support for Room
     implementation "androidx.room:room-rxjava3:$room_version"
+
+    // optional - Test helpers
+    testImplementation "androidx.room:room-testing:$room_version"
+
+    androidTestCompile ("android.arch.core:core-testing:$room_version") {
+        exclude module: 'support-compat'
+        exclude module: 'support-annotations'
+        exclude module: 'support-core-utils'
+    }
 
 
     // RxJava

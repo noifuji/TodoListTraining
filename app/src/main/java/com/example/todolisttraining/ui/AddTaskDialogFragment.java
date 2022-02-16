@@ -1,39 +1,48 @@
-package com.example.todolisttraining;
+package com.example.todolisttraining.ui;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.example.todolisttraining.R;
+import com.example.todolisttraining.viewmodel.TaskListViewModel;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class AddTaskDialogFragment  extends DialogFragment {
     private final String TAG = "AddTaskDialogFragment";
-
-    public interface AddTaskDialogListener {
-        public void onDialogPositiveClick(String value);
-    }
-
-    private AddTaskDialogListener listener;
+    private TaskListViewModel mTaskListViewModel;
+    private final CompositeDisposable mDisposable = new CompositeDisposable();
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        // Verify that the host activity implements the callback interface
-        try {
-            // Instantiate the NoticeDialogListener so we can send events to the host
-            listener = (AddTaskDialogListener) context;
-        } catch (ClassCastException e) {
-            // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(context.toString()
-                    + " must implement NoticeDialogListener");
-        }
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mTaskListViewModel = new ViewModelProvider(this).get(TaskListViewModel.class);
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mDisposable.clear();
     }
 
     @NonNull
@@ -53,7 +62,11 @@ public class AddTaskDialogFragment  extends DialogFragment {
 
                         EditText editText = (EditText) getDialog().findViewById(R.id.task_text);
                         if (editText != null) {
-                            listener.onDialogPositiveClick(editText.getText().toString());
+                            mDisposable.add(mTaskListViewModel.insertTask(editText.getText().toString())
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(() -> {},
+                                            throwable -> Log.e(TAG, "Unable to update username", throwable)));
                         } else {
                             Log.e("", "EditText not found!");
                         }
