@@ -9,8 +9,19 @@ public class TaskEntity {
     @PrimaryKey(autoGenerate = true)
     public int id;
 
-    @ColumnInfo(name = "first_name")
+    @ColumnInfo(name = "text")
     public String text;
+
+    @ColumnInfo(name = "is_important")
+    public boolean isImportant;
+
+    public boolean isImportant() {
+        return isImportant;
+    }
+
+    public void setImportant(boolean important) {
+        isImportant = important;
+    }
 
     public int getId() {
         return id;

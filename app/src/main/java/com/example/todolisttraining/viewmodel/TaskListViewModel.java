@@ -41,43 +41,20 @@ public class TaskListViewModel extends AndroidViewModel {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    public Flowable<List<String>> getTaskTextList() {
+    public Flowable<List<TaskEntity>> getTaskTextList() {
         return mTaskDAO.getAll()
-                // for every emission of the user, get the user name
                 .map(tasks -> {
                     mTasks = tasks;
-                    return tasks.stream()
-                            .map(task -> task.getText())
-                            .collect(Collectors.toList());
+                    return tasks;
                 });
 
     }
 
-    public Completable insertTask(final String text) {
-        TaskEntity task = new TaskEntity();
-        task.setText(text);
+    public Completable insertTask(final TaskEntity task) {
         return mTaskDAO.insert(task);
     }
 
     public Completable deleteTask(int position) {
         return mTaskDAO.delete(mTasks.get(position));
     }
-
-
-/*    public static class TaskListViewModelFactory extends ViewModelProvider.NewInstanceFactory {
-
-        @NonNull
-        private final Application mApplication;
-
-        public TaskListViewModelFactory(@NonNull Application application) {
-            mApplication = application;
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        @NonNull
-        public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-            return (T) new TaskListViewModel(mApplication);
-        }
-    }*/
 }

@@ -1,12 +1,12 @@
 package com.example.todolisttraining.ui;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
@@ -16,6 +16,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.todolisttraining.R;
+import com.example.todolisttraining.db.TaskEntity;
 import com.example.todolisttraining.viewmodel.TaskListViewModel;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -56,27 +57,28 @@ public class AddTaskDialogFragment  extends DialogFragment {
 
 
         builder.setMessage("タスクの追加")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Log.d(TAG, "OK was clicked.");
+                .setPositiveButton("OK", (dialog, id) -> {
+                    Log.d(TAG, "OK was clicked.");
 
-                        EditText editText = (EditText) getDialog().findViewById(R.id.task_text);
-                        if (editText != null) {
-                            mDisposable.add(mTaskListViewModel.insertTask(editText.getText().toString())
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(() -> {},
-                                            throwable -> Log.e(TAG, "Unable to update username", throwable)));
-                        } else {
-                            Log.e("", "EditText not found!");
-                        }
-
+                    EditText editText = (EditText) getDialog().findViewById(R.id.task_text);
+                    CheckBox isImportantCheckBox= (CheckBox) getDialog().findViewById(R.id.task_is_important);
+                    if (editText != null) {
+                        TaskEntity task = new TaskEntity();
+                        task.setId(0);
+                        task.setImportant(isImportantCheckBox.isChecked());
+                        task.setText(editText.getText().toString());
+                        mDisposable.add(mTaskListViewModel.insertTask(task)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(() -> {},
+                                        throwable -> Log.e(TAG, "Unable to update username", throwable)));
+                    } else {
+                        Log.e("", "EditText not found!");
                     }
+
                 })
-                .setNegativeButton("キャンセル", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User cancelled the dialog
-                    }
+                .setNegativeButton("キャンセル", (dialog, id) -> {
+                    // User cancelled the dialog
                 });
         // Create the AlertDialog object and return it
         return builder.create();
