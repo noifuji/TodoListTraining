@@ -2,22 +2,19 @@ package com.example.todolisttraining.db;
 
 import android.content.Context;
 
-import androidx.room.AutoMigration;
 import androidx.room.Database;
-import androidx.room.RenameColumn;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
-import androidx.room.migration.AutoMigrationSpec;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {TaskEntity.class}, version = 2, exportSchema = true)
+@Database(entities = {TaskEntity.class}, version = 3, exportSchema = true)
 public abstract class AppDatabase  extends RoomDatabase {
 
     private static AppDatabase sInstance;
     public static final String DATABASE_NAME = "mydb";
 
-    public abstract TaskDAO taskDAO();
+    public abstract TaskLocalDataSource getTaskLocalDataSource();
 
     public static AppDatabase getInstance(final Context context) {
         if (sInstance == null) {
@@ -25,6 +22,7 @@ public abstract class AppDatabase  extends RoomDatabase {
                 if (sInstance == null) {
                     sInstance = Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME)
                             .addMigrations(MIGRATION_1_2)
+                            .addMigrations(MIGRATION_2_3)
                             .build();
                 }
             }
@@ -39,6 +37,16 @@ public abstract class AppDatabase  extends RoomDatabase {
                     + " ADD COLUMN is_important INTEGER not null default 0");
             database.execSQL("ALTER TABLE tasks "
                     + " RENAME COLUMN first_name TO text");
+        }
+    };
+
+    public static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE tasks "
+                    + " ADD COLUMN is_removed INTEGER not null default 0");
+            database.execSQL("ALTER TABLE tasks "
+                    + " ADD COLUMN uuid TEXT");
         }
     };
 }

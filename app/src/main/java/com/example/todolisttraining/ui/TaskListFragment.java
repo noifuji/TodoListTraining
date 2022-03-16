@@ -86,10 +86,13 @@ public class TaskListFragment extends Fragment implements DeleteTaskListener {
 
     @Override
     public void onClickDeleteTask(int position) {
-        mDisposable.add(mTaskListViewModel.deleteTask(position)
+       mDisposable.add(mTaskListViewModel.deleteTask(position)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> mAdapter.notifyDataSetChanged(),
+                .subscribe(() -> {
+                    mAdapter.notifyDataSetChanged();
+                    Log.d(TAG, "delete was completed");
+                    },
                         throwable -> Log.e(TAG, "Unable to update username", throwable)));
 
     }

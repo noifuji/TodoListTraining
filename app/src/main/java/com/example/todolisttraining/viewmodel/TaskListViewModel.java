@@ -8,11 +8,11 @@ import androidx.annotation.RequiresApi;
 import androidx.lifecycle.AndroidViewModel;
 
 import com.example.todolisttraining.AppComponent;
-import com.example.todolisttraining.db.TaskDAO;
+import com.example.todolisttraining.db.TaskLocalDataSource;
 import com.example.todolisttraining.db.TaskEntity;
+import com.example.todolisttraining.db.TaskRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
@@ -32,17 +32,17 @@ import io.reactivex.rxjava3.core.Flowable;
 
 public class TaskListViewModel extends AndroidViewModel {
     private final String TAG = "TaskViewModel";
-    private TaskDAO mTaskDAO;
     private List<TaskEntity> mTasks;
+    private TaskRepository mTaskRepository;
 
     public TaskListViewModel(@NonNull Application application){
         super(application);
-        mTaskDAO = ((AppComponent)application).getDatabase().taskDAO();
+        mTaskRepository = ((AppComponent)application).getTaskRepository();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public Flowable<List<TaskEntity>> getTaskTextList() {
-        return mTaskDAO.getAll()
+        return mTaskRepository.getAll()
                 .map(tasks -> {
                     mTasks = tasks;
                     return tasks;
@@ -51,10 +51,10 @@ public class TaskListViewModel extends AndroidViewModel {
     }
 
     public Completable insertTask(final TaskEntity task) {
-        return mTaskDAO.insert(task);
+        return mTaskRepository.insert(task);
     }
 
     public Completable deleteTask(int position) {
-        return mTaskDAO.delete(mTasks.get(position));
+        return mTaskRepository.delete(mTasks.get(position));
     }
 }

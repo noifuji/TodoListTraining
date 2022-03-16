@@ -67,11 +67,13 @@ public class AddTaskDialogFragment  extends DialogFragment {
                         task.setId(0);
                         task.setImportant(isImportantCheckBox.isChecked());
                         task.setText(editText.getText().toString());
-                        mDisposable.add(mTaskListViewModel.insertTask(task)
+                        mTaskListViewModel.insertTask(task)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(() -> {},
-                                        throwable -> Log.e(TAG, "Unable to update username", throwable)));
+                                .subscribe(() -> {
+                                    Log.d(TAG, "insert completed");
+                                        },
+                                        throwable -> Log.e(TAG, "Unable to update username", throwable));
                     } else {
                         Log.e("", "EditText not found!");
                     }

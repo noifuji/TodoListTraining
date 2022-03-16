@@ -15,6 +15,12 @@ public class TaskEntity {
     @ColumnInfo(name = "is_important")
     public boolean isImportant;
 
+    @ColumnInfo(name = "is_removed")
+    public boolean isRemoved;
+
+    @ColumnInfo(name = "uuid")
+    public String uuid;
+
     public boolean isImportant() {
         return isImportant;
     }
@@ -37,5 +43,21 @@ public class TaskEntity {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public boolean isRemoved() {
+        return isRemoved;
+    }
+
+    public void setRemoved(boolean removed) {
+        isRemoved = removed;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }
